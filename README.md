@@ -1,6 +1,6 @@
 # linstor-scheduler-extender
 
-![Latest release](https://img.shields.io/github/v/release/kvaps/linstor-scheduler-extender)
+![Latest release](https://img.shields.io/github/v/release/piraeusdatastore/linstor-scheduler-extender)
 
 LINSTOR scheduler extender plugin for Kubernetes which allows a storage driver to give the Kubernetes scheduler hints about where to place a new pod so that it is optimally located for storage performance.
 

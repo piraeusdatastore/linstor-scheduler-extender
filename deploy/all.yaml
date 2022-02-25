@@ -40,7 +40,7 @@ spec:
           command:
           - kube-scheduler
           - --config=/etc/kubernetes/scheduler-config.yaml
-          - --leader-elect=true 
+          - --leader-elect=true
           - --leader-elect-resource-name=linstor-scheduler
           - --leader-elect-resource-namespace=$(NAMESPACE)
           env:
@@ -74,7 +74,7 @@ spec:
           - mountPath: /etc/kubernetes
             name: scheduler-config
         - name: linstor-scheduler-extender
-          image: ghcr.io/kvaps/linstor-scheduler-extender:v0.1.0
+          image: quay.io/piraeusdatastore/linstor-scheduler-extender:v0.2.0
           imagePullPolicy: IfNotPresent
           args:
           - --verbose=true

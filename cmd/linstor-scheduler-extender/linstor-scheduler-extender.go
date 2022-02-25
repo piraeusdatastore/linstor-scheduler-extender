@@ -7,20 +7,21 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/kvaps/linstor-scheduler-extender/pkg/consts"
-	_ "github.com/kvaps/linstor-scheduler-extender/pkg/driver"
 	"github.com/libopenstorage/stork/drivers/volume"
 	"github.com/libopenstorage/stork/pkg/extender"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	api_v1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	core_v1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+
+	"github.com/piraeusdatastore/linstor-scheduler-extender/pkg/consts"
+	_ "github.com/piraeusdatastore/linstor-scheduler-extender/pkg/driver"
 )
 
 var ext *extender.Extender
@@ -75,16 +76,16 @@ func run(c *cli.Context) {
 	}
 
 	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartRecordingToSink(&core_v1.EventSinkImpl{Interface: k8sClient.CoreV1().Events("")})
-	recorder := eventBroadcaster.NewRecorder(scheme.Scheme, api_v1.EventSource{Component: consts.EventComponentName})
+	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: k8sClient.CoreV1().Events("")})
+	recorder := eventBroadcaster.NewRecorder(scheme.Scheme, apiv1.EventSource{Component: consts.EventComponentName})
 
 	d, err := volume.Get("linstor")
 	if err != nil {
-		log.Fatalf("Error getting Stork Driver %v: %v", "linstor", err)
+		log.Fatalf("Error getting Scheduler Driver %v: %v", "linstor", err)
 	}
 
 	if err = d.Init(nil); err != nil {
-		log.Fatalf("Error initializing Stork Driver %v: %v", "linstor", err)
+		log.Fatalf("Error initializing Scheduler Driver %v: %v", "linstor", err)
 	}
 
 	ext = &extender.Extender{
