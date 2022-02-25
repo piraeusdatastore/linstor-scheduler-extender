@@ -6,11 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2022-02-25
+
+### Changed
+
+- Moved to Piraeus Organization
+
 ## [0.1.0] - 2022-02-07
 
 ### Added
 
 - Initial command, import stork scheduler extender and linstor driver code
 
-[Unreleased]: https://github.com/LINBIT/linstor-wait-until/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/LINBIT/linstor-wait-until/releases/tag/v0.1.0
+[Unreleased]: https://github.com/piraeusdatastore/linstor-scheduler-extender/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/piraeusdatastore/linstor-scheduler-extender/releases/tag/v0.2.0
+[0.1.0]: https://github.com/piraeusdatastore/linstor-scheduler-extender/releases/tag/v0.1.0

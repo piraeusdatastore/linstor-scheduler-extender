@@ -14,7 +14,7 @@ ARG VERSION=v0.0.0-0.unknown
 
 ARG TARGETOS
 ARG TARGETARCH
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-X github.com/kvaps/linstor-scheduler-extender/pkg/consts.Version=${VERSION} -extldflags=-static"  -v ./cmd/...
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-X github.com/piraeusdatastore/linstor-scheduler-extender/pkg/consts.Version=${VERSION} -extldflags=-static"  -v ./cmd/...
 
 FROM --platform=$BUILDPLATFORM golang:1.17 as downloader
 
