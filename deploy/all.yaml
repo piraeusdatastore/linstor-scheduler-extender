@@ -106,51 +106,6 @@ metadata:
   namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: linstor-scheduler
-rules:
-  - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
-    resources: ["events"]
-    verbs: ["create", "patch", "update"]
-  - apiGroups: [""]
-    resources: ["nodes"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
-    resources: ["pods", "namespaces"]
-    verbs: ["delete", "get", "list", "watch"]
-  - apiGroups: [""]
-    resources: ["bindings", "pods/binding"]
-    verbs: ["create"]
-  - apiGroups: [""]
-    resources: ["pods/status"]
-    verbs: ["patch", "update"]
-  - apiGroups: [""]
-    resources: ["replicationcontrollers", "services"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["*"]
-    resources: ["replicasets"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["apps"]
-    resources: ["statefulsets"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["policy"]
-    resources: ["poddisruptionbudgets"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
-    resources: ["persistentvolumeclaims", "persistentvolumes"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["storage.k8s.io"]
-    resources: ["storageclasses", "csinodes","csidrivers", "csistoragecapacities"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["events.k8s.io"]
-    resources: ["events"]
-    verbs: ["create"]
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: linstor-scheduler
@@ -168,11 +123,24 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: linstor-scheduler
+  name: linstor-scheduler-kube-scheduler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: linstor-scheduler
+  name: system:kube-scheduler
+subjects:
+  - kind: ServiceAccount
+    name: linstor-scheduler
+    namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: linstor-scheduler-volume-scheduler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:volume-scheduler
 subjects:
   - kind: ServiceAccount
     name: linstor-scheduler
@@ -187,6 +155,20 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: linstor-scheduler
+subjects:
+  - kind: ServiceAccount
+    name: linstor-scheduler
+    namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: linstor-scheduler-extension-apiserver-authentication-reader
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: extension-apiserver-authentication-reader
 subjects:
   - kind: ServiceAccount
     name: linstor-scheduler
