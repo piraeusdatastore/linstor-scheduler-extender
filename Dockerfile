@@ -16,11 +16,6 @@ ARG TARGETOS
 ARG TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-X github.com/piraeusdatastore/linstor-scheduler-extender/pkg/consts.Version=${VERSION} -extldflags=-static" -o . -v ./cmd/...
 
-FROM --platform=$BUILDPLATFORM golang:1.17 as downloader
-
-ARG TARGETOS
-ARG TARGETARCH
-
 FROM gcr.io/distroless/static:latest
 COPY --from=builder /src/linstor-scheduler-extender /linstor-scheduler-extender
 COPY --from=builder /src/linstor-scheduler-admission /linstor-scheduler-admission
