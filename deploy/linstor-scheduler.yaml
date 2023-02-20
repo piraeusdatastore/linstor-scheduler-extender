@@ -74,7 +74,7 @@ spec:
           - mountPath: /etc/kubernetes
             name: scheduler-config
         - name: linstor-scheduler-extender
-          image: quay.io/piraeusdatastore/linstor-scheduler-extender:v0.2.1
+          image: quay.io/piraeusdatastore/linstor-scheduler-extender:v0.3.1
           imagePullPolicy: IfNotPresent
           args:
           - --verbose=true
