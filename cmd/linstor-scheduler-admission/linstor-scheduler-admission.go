@@ -53,7 +53,7 @@ func run(cli kubernetes.Interface) error {
 	cfg := initFlags()
 
 	// Create mutator.
-	mt := kwhmutating.MutatorFunc(func(ctx context.Context, _ *kwhmodel.AdmissionReview, obj metav1.Object) (*kwhmutating.MutatorResult, error) {
+	mt := kwhmutating.MutatorFunc(func(ctx context.Context, ar *kwhmodel.AdmissionReview, obj metav1.Object) (*kwhmutating.MutatorResult, error) {
 		pod, ok := obj.(*corev1.Pod)
 		if !ok {
 			return &kwhmutating.MutatorResult{}, nil
@@ -83,7 +83,7 @@ func run(cli kubernetes.Interface) error {
 		// Check PVCs
 		for _, pvcName := range pvcNames {
 			var discoveredProvisioner string
-			pvc, err := cli.CoreV1().PersistentVolumeClaims(pod.Namespace).Get(ctx, pvcName, metav1.GetOptions{})
+			pvc, err := cli.CoreV1().PersistentVolumeClaims(ar.Namespace).Get(ctx, pvcName, metav1.GetOptions{})
 			if err != nil && !errors.IsNotFound(err) {
 				return &kwhmutating.MutatorResult{}, err
 			}
