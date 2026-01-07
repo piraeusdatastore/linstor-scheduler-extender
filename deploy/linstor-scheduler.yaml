@@ -7,7 +7,7 @@ metadata:
 
 data:
   scheduler-config.yaml: |-
-    apiVersion: kubescheduler.config.k8s.io/v1beta3
+    apiVersion: kubescheduler.config.k8s.io/v1
     kind: KubeSchedulerConfiguration
     profiles:
       - schedulerName: linstor
