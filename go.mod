@@ -58,7 +58,6 @@ require (
 	github.com/libopenstorage/stork v1.4.1-0.20220512171133-b99428ee1ddf
 	github.com/portworx/sched-ops v1.20.4-rc1.0.20220401024625-dbc61a336f65
 	github.com/sirupsen/logrus v1.9.0
-	github.com/slok/kubewebhook/v2 v2.1.0
 	github.com/urfave/cli v1.22.5
 	k8s.io/api v0.25.6
 	k8s.io/apimachinery v0.25.6
@@ -137,8 +136,6 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
-	gomodules.xyz/jsonpatch/v3 v3.0.1 // indirect
-	gomodules.xyz/orderedmap v0.1.0 // indirect
 	google.golang.org/api v0.114.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
