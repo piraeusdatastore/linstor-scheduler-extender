@@ -8,6 +8,7 @@ import (
 
 	lstor "github.com/LINBIT/golinstor"
 	lclient "github.com/LINBIT/golinstor/client"
+	"github.com/LINBIT/golinstor/devicelayerkind"
 	snapv1 "github.com/kubernetes-incubator/external-storage/snapshot/pkg/apis/crd/v1"
 	snapshotVolume "github.com/kubernetes-incubator/external-storage/snapshot/pkg/volume"
 	storkvolume "github.com/libopenstorage/stork/drivers/volume"
@@ -134,6 +135,21 @@ func contains(a []string, e string) bool {
 	return false
 }
 
+// hasDRBDLayer reports whether the resource (or any nested layer) is built on top of DRBD.
+// Storage-only resources (e.g. single-replica ZFS without DRBD) do not have meaningful
+// DiskState reported, so the UpToDate check below must be skipped for them.
+func hasDRBDLayer(layer lclient.ResourceLayer) bool {
+	if layer.Type == devicelayerkind.Drbd {
+		return true
+	}
+	for _, c := range layer.Children {
+		if hasDRBDLayer(c) {
+			return true
+		}
+	}
+	return false
+}
+
 func (l *linstor) InspectVolume(volumeID string) (*storkvolume.Info, error) {
 	cli, err := l.linstorClient()
 	if err != nil {
@@ -153,11 +169,16 @@ func (l *linstor) InspectVolume(volumeID string) (*storkvolume.Info, error) {
 
 	var nodes []string
 	for _, r := range resources {
-		state := r.Volumes[0].State.DiskState
-		if state != "UpToDate" {
-			logrus.Debugf("Resource %s is not UpToDate on node %s, skipping (is %s)",
-				r.Name, r.NodeName, state)
-			continue
+		// DiskState semantics ("UpToDate", "Outdated", ...) are only meaningful when the
+		// resource is built on top of DRBD. Storage-only resources report an empty state
+		// because there is no DRBD device, so they were previously incorrectly filtered out.
+		if hasDRBDLayer(r.LayerObject) {
+			state := r.Volumes[0].State.DiskState
+			if state != "UpToDate" {
+				logrus.Debugf("Resource %s is not UpToDate on node %s, skipping (is %s)",
+					r.Name, r.NodeName, state)
+				continue
+			}
 		}
 
 		if contains(r.Flags, lstor.FlagDiskless) {
