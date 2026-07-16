@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Reload the admission webhook's TLS certificate when it changes on disk. The webhook loaded `-tls-cert-file`/`-tls-key-file` once at startup and kept serving the original certificate after the mounted Secret was rotated, so once the apiserver trusted the new CA the handshake failed and — with `failurePolicy: Ignore` — the webhook silently stopped assigning the scheduler until it was restarted. The certificate is now served through `tls.Config.GetCertificate` and reloaded automatically after rotation, so no external cert-reload workaround is required.
+
 ## [0.3.4] - 2026-05-12
 
 ### Fixed
