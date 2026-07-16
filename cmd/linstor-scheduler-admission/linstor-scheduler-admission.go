@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -18,10 +20,14 @@ import (
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+
+	"github.com/piraeusdatastore/linstor-scheduler-extender/pkg/certreload"
 )
 
 const annBetaStorageProvisioner = "volume.beta.kubernetes.io/storage-provisioner"
 const annStorageProvisioner = "volume.kubernetes.io/storage-provisioner"
+
+const listenAddr = ":8080"
 
 type config struct {
 	certFile      string
@@ -203,8 +209,28 @@ func run(cli kubernetes.Interface) error {
 		handleMutate(w, r, cli, cfg)
 	})
 
-	logrus.Infof("Listening on :8080")
-	return http.ListenAndServeTLS(":8080", cfg.certFile, cfg.keyFile, mux)
+	// Serve the certificate through a reloader so it is picked up again after
+	// rotation (e.g. cert-manager renewing the mounted Secret) without
+	// restarting the webhook.
+	reloader, err := certreload.New(cfg.certFile, cfg.keyFile, logrus.StandardLogger())
+	if err != nil {
+		return fmt.Errorf("error loading TLS certificate: %w", err)
+	}
+
+	server := &http.Server{
+		Addr:              listenAddr,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
+		TLSConfig: &tls.Config{
+			MinVersion:     tls.VersionTLS12,
+			GetCertificate: reloader.GetCertificate,
+		},
+	}
+
+	logrus.Infof("Listening on %s", listenAddr)
+	// The certificate and key come from TLSConfig.GetCertificate, so the file
+	// arguments are intentionally empty here.
+	return server.ListenAndServeTLS("", "")
 }
 
 func main() {
